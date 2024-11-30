@@ -1,0 +1,43 @@
+[
+    {
+      "categoria": "Placas de video",
+      "productos": [
+        { "nombre": "NVidia Geforce RTX 4090", "precio": 1400, "imagen": "./img/rtx-4090.png" },
+        { "nombre": "NVidia Geforce GTX 1660S", "precio": 600, "imagen": "./img/gtx-1660S.png" },
+        { "nombre": "AMD Radeon RX 6700xt", "precio": 1350, "imagen": "./img/rx-6700xt.png" }
+      ]
+    },
+    {
+      "categoria": "Procesadores",
+      "productos": [
+        { "nombre": "Intel I7 9700K", "precio": 250, "imagen": "./img/i7-9700k.png" },
+        { "nombre": "Intel I9 13900K", "precio": 1300, "imagen": "./img/i9-13900k.png" },
+        { "nombre": "AMD Ryzen 9 7950x", "precio": 1400, "imagen": "./img/ryzen-9-7950x.png" }
+      ]
+    },
+    {
+      "categoria": "Placas Madre",
+      "productos": [
+        { "nombre": "Gigabyte B450MK", "precio": 800, "imagen": "./img/gigabyte-b450mk.png" },
+        { "nombre": "Asus Prime Z590-A", "precio": 650, "imagen": "./img/asus-z590-a.png" },
+        { "nombre": "MSI A520M-A Pro", "precio": 600, "imagen": "./img/msi-a520m-a.png" }
+      ]
+    },
+    {
+      "categoria": "Ratones",
+      "productos": [
+        { "nombre": "Logitech G502", "precio": 250, "imagen": "./img/logitech-g502.png" },
+        { "nombre": "Logitech G PRO X Superlight", "precio": 400, "imagen": "./img/logitech-g-pro-x.png" },
+        { "nombre": "Razer Deathadder", "precio": 350, "imagen": "./img/razer-deathadder.png" }
+      ]
+    },
+    {
+      "categoria": "Teclados",
+      "productos": [
+        { "nombre": "Kumara K552", "precio": 250, "imagen": "./img/kumara-k552.png" },
+        { "nombre": "Razer Huntsman Mini", "precio": 450, "imagen": "./img/razer-huntsman-mini.png" },
+        { "nombre": "HyperX Alloy Origins 60", "precio": 350, "imagen": "./img/hyperx-alloy-origins.png" }
+      ]
+    }
+  ]
+  

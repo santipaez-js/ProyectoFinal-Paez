@@ -4,133 +4,150 @@ let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 // Referencias al DOM
 const carritoDiv = document.getElementById("carrito");
 const totalDiv = document.getElementById("total");
-const botonesAgregar = document.querySelectorAll(".agregar-btn");
+const main = document.querySelector("main");
+
+// Función para renderizar los productos dinámicamente
+async function cargarProductos() {
+    try {
+        const respuesta = await fetch("./productos.json");
+        const categorias = await respuesta.json();
+
+        categorias.forEach((categoria) => {
+            const section = document.createElement("section");
+            section.classList.add("mb-5");
+
+            let html = `
+                <h2 class="text-dark contenedor">${categoria.categoria}:</h2>
+                <div class="row">
+            `;
+
+            categoria.productos.forEach((producto) => {
+                html += `
+                    <div class="col-12 col-md-4 text-center">
+                        <div class="text-dark contenedor">
+                            <h3>${producto.nombre}</h3>
+                            <h3>$${producto.precio}</h3>
+                        </div>
+                        <img src="${producto.imagen}" alt="${producto.nombre}" class="img-fluid mb-3">
+                        <button class="btn btn-dark agregar-btn">Agregar al carrito</button>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            section.innerHTML = html;
+            main.insertBefore(section, main.lastElementChild); // Insertar antes del carrito
+        });
+
+        agregarEventosBotones(); // Asociar eventos
+    } catch (error) {
+        console.error("Error al cargar productos:", error);
+    }
+}
+
+// Función para agregar eventos a botones de agregar al carrito
+function agregarEventosBotones() {
+    const botonesAgregar = document.querySelectorAll(".agregar-btn");
+    botonesAgregar.forEach((boton) => {
+        boton.addEventListener("click", agregarAlCarrito);
+    });
+}
+
+// Función para agregar un producto al carrito
+function agregarAlCarrito(e) {
+    const card = e.target.closest(".col-12");
+    const nombre = card.querySelector("h3").innerText;
+    const precio = parseFloat(card.querySelector("h3:nth-of-type(2)").innerText.replace("$", ""));
+
+    const productoExistente = carrito.find((item) => item.nombre === nombre);
+
+    if (productoExistente) {
+        productoExistente.cantidad++;
+    } else {
+        carrito.push({ nombre, precio, cantidad: 1 });
+    }
+
+    guardarCarrito();
+    renderizarCarrito();
+
+    // SweetAlert: Confirmación al agregar
+    Swal.fire({
+        icon: "success",
+        title: "Producto agregado",
+        text: `${nombre} se agregó al carrito.`,
+        timer: 2000,
+        showConfirmButton: false,
+    });
+}
 
 // Función para renderizar el carrito
 function renderizarCarrito() {
-    carritoDiv.innerHTML = ""; // Limpiar contenido previo
+    carritoDiv.innerHTML = ""; // Vaciar el contenido previo
 
     if (carrito.length === 0) {
-        carritoDiv.innerHTML = `<p class="text-muted">El carrito está vacío.</p>`;
-        totalDiv.innerHTML = "";
+        carritoDiv.innerHTML = "<p>El carrito está vacío.</p>";
+        totalDiv.innerText = "$0";
         return;
     }
 
-    // Crear tabla de productos
-    const tabla = document.createElement("table");
-    tabla.className = "table table-striped table-hover";
+    carrito.forEach((producto) => {
+        const div = document.createElement("div");
+        div.classList.add("item-carrito");
 
-    let contenidoTabla = `
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Producto</th>
-          <th>Precio</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody>
-    `;
-
-    let total = 0;
-
-    carrito.forEach((producto, index) => {
-        const { nombre, precio } = producto; // Desestructuración
-        contenidoTabla += `
-          <tr>
-            <td>${index + 1}</td>
-            <td>${nombre}</td>
-            <td>$${precio}</td>
-            <td>
-              <button class="btn btn-danger btn-sm" onclick="eliminarProducto(${index})">
-                Eliminar
-              </button>
-            </td>
-          </tr>
+        div.innerHTML = `
+            <p>${producto.nombre} - $${producto.precio} x ${producto.cantidad}</p>
+            <button class="btn btn-danger btn-sm eliminar-btn">Eliminar</button>
         `;
-        total += precio; // Sumar al total
+
+        div.querySelector(".eliminar-btn").addEventListener("click", () => eliminarProducto(producto.nombre));
+        carritoDiv.appendChild(div);
     });
 
-    contenidoTabla += "</tbody>";
-    tabla.innerHTML = contenidoTabla;
-    carritoDiv.appendChild(tabla);
-
-    // Mostrar total
-    totalDiv.innerHTML = `<h5>Total: $${total.toFixed(2)}</h5>`;
+    totalDiv.innerText = `$${calcularTotal()}`;
 }
 
-// Función para agregar productos al carrito
-function agregarAlCarrito(e) {
-    const card = e.target.closest(".text-center");
-    const nombre = card.querySelector("h3").innerText;
-    const precioTexto = card.querySelector("h3:nth-of-type(2)").innerText;
-    const precio = parseFloat(precioTexto.replace("$", "")); // Convertir a número
+// Función para eliminar un producto del carrito
+function eliminarProducto(nombre) {
+    carrito = carrito.filter((producto) => producto.nombre !== nombre);
+    guardarCarrito();
+    renderizarCarrito();
 
-    // Agregar producto al carrito
-    carrito.push({ nombre, precio });
-    localStorage.setItem("carrito", JSON.stringify(carrito)); // Guardar en storage
-    renderizarCarrito(); // Actualizar visualización
-}
-
-// Función para eliminar un producto
-function eliminarProducto(index) {
+    // SweetAlert: Confirmación al eliminar
     Swal.fire({
-        title: '¿Estás seguro?',
-        text: 'Este producto será eliminado del carrito.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            carrito.splice(index, 1); // Quitar del carrito
-            localStorage.setItem("carrito", JSON.stringify(carrito)); // Actualizar storage
-            renderizarCarrito(); // Actualizar visualización
-            Swal.fire({
-                icon: 'success',
-                title: 'Producto eliminado',
-                text: 'El producto fue eliminado del carrito.',
-            });
-        }
+        icon: "info",
+        title: "Producto eliminado",
+        text: `${nombre} fue eliminado del carrito.`,
+        timer: 2000,
+        showConfirmButton: false,
     });
 }
 
-// Función para vaciar el carrito
+// Función para vaciar todo el carrito
 function vaciarCarrito() {
-    if (carrito.length === 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'El carrito ya está vacío',
-            text: 'No hay productos para eliminar.',
-        });
-        return;
-    }
+    carrito = [];
+    guardarCarrito();
+    renderizarCarrito();
 
+    // SweetAlert: Confirmación al vaciar el carrito
     Swal.fire({
-        title: '¿Estás seguro?',
-        text: 'Se eliminarán todos los productos del carrito.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, vaciar',
-        cancelButtonText: 'Cancelar',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            carrito = []; // Vaciar array
-            localStorage.removeItem("carrito"); // Limpiar storage
-            renderizarCarrito(); // Actualizar visualización
-            Swal.fire({
-                icon: 'success',
-                title: 'Carrito vaciado',
-                text: 'Todos los productos fueron eliminados.',
-            });
-        }
+        icon: "warning",
+        title: "Carrito vacío",
+        text: "Se eliminaron todos los productos del carrito.",
+        timer: 2000,
+        showConfirmButton: false,
     });
 }
 
-// Agregar eventos a los botones de agregar al carrito
-botonesAgregar.forEach((boton) => {
-    boton.addEventListener("click", agregarAlCarrito);
-});
+// Función para calcular el total del carrito
+function calcularTotal() {
+    return carrito.reduce((total, producto) => total + producto.precio * producto.cantidad, 0);
+}
 
-// Renderizar carrito al cargar la página
-renderizarCarrito();
+// Función para guardar el carrito en LocalStorage
+function guardarCarrito() {
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+}
+
+// Inicialización
+cargarProductos(); // Cargar productos dinámicamente
+renderizarCarrito(); // Renderizar carrito al cargar la página
