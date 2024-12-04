@@ -2,9 +2,9 @@
     {
       "categoria": "Placas de video",
       "productos": [
-        { "nombre": "NVidia Geforce RTX 4090", "precio": 1400, "imagen": "./img/rtx-4090.png" },
-        { "nombre": "NVidia Geforce GTX 1660S", "precio": 600, "imagen": "./img/gtx-1660S.png" },
-        { "nombre": "AMD Radeon RX 6700xt", "precio": 1350, "imagen": "./img/rx-6700xt.png" }
+        { "nombre": "NVidia Geforce RTX 4090", "precio": 1400, "imagen": "../img/rtx-4090.png" },
+        { "nombre": "NVidia Geforce GTX 1660S", "precio": 600, "imagen": "../img/gtx-1660S.png" },
+        { "nombre": "AMD Radeon RX 6700xt", "precio": 1350, "imagen": "../img/rx-6700xt.png" }
       ]
     },
     {
